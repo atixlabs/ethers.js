@@ -89,14 +89,11 @@ function checkHash(hash, requirePrefix) {
         if (bytes_1.hexDataLength(hash) === 32) {
             return hash.toLowerCase();
         } else if (bytes_1.hexDataLength(hash) < 32) {
-            let filledHash = '0x';
-            const originalData = hash.substring(2, hash.length);
-            const toFillWithZeros = 64 - originalData.length;
-            for (let i = 0; i < toFillWithZeros; i++) {
-                filledHash += '0';
-            }
-            filledHash += originalData;
-            return filledHash.toLowerCase()
+            var prefix = '0x';
+            var data = hash.substring(2, hash.length);
+            var paddedData = data.padStart(64, '0');
+            var completeHash = prefix + paddedData;
+            return completeHash.toLowerCase();
         }
     }
     errors.throwError('invalid hash', errors.INVALID_ARGUMENT, { arg: 'hash', value: hash });
@@ -1138,6 +1135,9 @@ var BaseProvider = /** @class */ (function (_super) {
     };
     BaseProvider.checkTransactionResponse = function (transaction) {
         return checkTransactionResponse(transaction);
+    };
+    BaseProvider.checkTransactionReceipt = function (transaction) {
+        return checkTransactionReceipt(transaction);
     };
     BaseProvider.prototype.doPoll = function () {
     };

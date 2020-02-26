@@ -512,3 +512,103 @@ describe('Test Basic Authentication', function() {
         }, 'throws an exception for insecure connections');
     })
 });
+
+describe("Test check transaction response", function() {
+  var BaseProvider = ethers.providers.BaseProvider;
+  var txResponse = {
+    hash: "0xe9e5317077ce101fc6520a9596bff0b387ccd1fbf274800d827956cd2dd1c5f9",
+    nonce: "0x0",
+    blockHash:
+      "0x01c93446898ebe93a9d2d3a8d3153f8fdf6eca6439cb3b824025131525c3a401",
+    blockNumber: "0x1",
+    transactionIndex: "0x0",
+    from: "0x3ac1caba8faa818f1aee0f2bfc08a7766c1debfb",
+    to: null,
+    value: 0,
+    gas: "0x1f5180",
+    gasPrice: "0x4a817c800",
+    input: "0x608060405234801561001057600080fd5b5061067b806100206000396000f3fe",
+    v: "0x25",
+    r: "0x7cbe49e8e2512d70d1804e60fd38215ecb1e94d946fc225347b8548ab29548e7",
+    s: "0x57a0d5e22abb650266377ceeff31e2250a4cc714a434964ceb2d6e503818ee91"
+  };
+
+  it("test transaction response doesn't fail when 'to' is null and value is 0", function() {
+    assert.doesNotThrow(function() {
+      BaseProvider.checkTransactionResponse(txResponse);
+    });
+  });
+  it("test transaction response bigNumberify value field when it is not zero", function() {
+    var formattedResponse = BaseProvider.checkTransactionResponse(
+      Object.assign({}, txResponse, { value: "0x4a817c800" })
+    );
+    assert.equal(
+      formattedResponse.value._hex,
+      utils.bigNumberify("0x4a817c800")._hex,
+      "value bigNumberified"
+    );
+  });
+  it("test transaction response bigNumberify value field when it is '0' (string)", function() {
+    var formattedResponse = BaseProvider.checkTransactionResponse(
+      Object.assign({}, txResponse, { value: "0" })
+    );
+    assert.equal(
+      formattedResponse.value._hex,
+      utils.bigNumberify("0x00")._hex,
+      "zero bigNumberified"
+    );
+  });
+});
+
+describe("Test check transaction receipt", function() {
+  var BaseProvider = ethers.providers.BaseProvider;
+  var txReceipt = {
+    transactionHash:
+      "0x449d42be3f98c8d343824748d720a9b3434baa7739655e943cd7b65ea80e3871",
+    transactionIndex: "0x0",
+    blockHash:
+      "0xccbded924516c0d87aeaa3cae16ec0301d1674b4e5672f5adafe05a152191ce3",
+    blockNumber: "0x3",
+    from: "0x3ac1caba8faa818f1aee0f2bfc08a7766c1debfb",
+    to: null,
+    gasUsed: "0x64380",
+    cumulativeGasUsed: "0x64380",
+    contractAddress: "0xdd3ebf6eb14a2d8cff6e8370ceb5d10d1c5c61b7",
+    logs: [],
+    root: null,
+    status: "0x00",
+    v: "0x26",
+    r: "0x2ac6051b8c6ae3b40ba32692ebaf8f883d571a75e2334172aa1b54005c37a35",
+    s: "0x6bfd25de98ebda50800367630b56e8f76f18a18b3473ec1d21daba71e25d1a84"
+  };
+  it("test transaction receipt doesn't fail when 'to' or 'root' are null", function() {
+    assert.doesNotThrow(function() {
+      BaseProvider.checkTransactionReceipt(txReceipt);
+    });
+  });
+  it("test convert transaction receipt 'to' field to null when its value is '0x00'", function() {
+    var formattedReceipt = BaseProvider.checkTransactionReceipt(
+      Object.assign({}, txReceipt, { to: "0x00" })
+    );
+    assert.equal(formattedReceipt.to, null, "to as null");
+  });
+  it("test transaction receipt pads root hash with missing zeros when it is shorter than 32 bytes", function() {
+    var formattedReceipt = BaseProvider.checkTransactionReceipt(
+      Object.assign({}, txReceipt, { root: "0x11" })
+    );
+    assert.equal(
+      formattedReceipt.root,
+      "0x" + "11".padStart(64, "0"),
+      "padded root"
+    );
+  });
+  it("test transaction receipt throw if 'root' is longer than 32 bytes", function() {
+    assert.throws(function() {
+      BaseProvider.checkTransactionReceipt(
+        Object.assign({}, txReceipt, {
+          root: "0x" + "11".padStart(66, "1")
+        })
+      );
+    }, "invalid hash");
+  });
+});

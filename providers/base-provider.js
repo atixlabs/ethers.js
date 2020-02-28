@@ -199,12 +199,16 @@ function checkTransactionResponse(transaction) {
     if (!transaction.raw) {
         // Very loose providers (e.g. TestRPC) don't provide a signature or raw
         if (transaction.v && transaction.r && transaction.s) {
+            var value = transaction.value;
+            if (value === "0") {
+                value = Number(value);
+            }
             var raw = [
                 bytes_1.stripZeros(bytes_1.hexlify(transaction.nonce)),
                 bytes_1.stripZeros(bytes_1.hexlify(transaction.gasPrice)),
                 bytes_1.stripZeros(bytes_1.hexlify(transaction.gasLimit)),
                 (transaction.to || "0x"),
-                bytes_1.stripZeros(bytes_1.hexlify(Number(transaction.value) || '0x')),
+                bytes_1.stripZeros(bytes_1.hexlify(value || '0x')),
                 bytes_1.hexlify(transaction.data || '0x'),
                 bytes_1.stripZeros(bytes_1.hexlify(transaction.v || '0x')),
                 bytes_1.stripZeros(bytes_1.hexlify(transaction.r)),

@@ -1,0 +1,4 @@
+.DS_Store
+tsconfig.json
+src.ts/
+tsconfig.tsbuildinfo

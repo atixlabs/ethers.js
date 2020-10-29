@@ -1,5 +1,6 @@
 {
   "name": "ethers",
+  "version": "5.0.19",
   "private": true,
   "repository": {
     "type": "git",

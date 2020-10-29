@@ -187,6 +187,9 @@ var JsonRpcSigner = /** @class */ (function (_super) {
             estimate.from = fromAddress;
             transaction.gasLimit = this.provider.estimateGas(estimate);
         }
+        if (transaction.value == null) {
+            transaction.value = 0;
+        }
         return properties_1.resolveProperties({
             tx: properties_1.resolveProperties(transaction),
             sender: fromAddress

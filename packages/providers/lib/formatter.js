@@ -195,6 +195,8 @@ var Formatter = /** @class */ (function () {
     // Requires a hash, optionally requires 0x prefix; returns prefixed lowercase hash.
     Formatter.prototype.hash = function (value, strict) {
         var result = this.hex(value, strict);
+        if (bytes_1.hexDataLength(result) < 32)
+            result = Formatter.fillWithZeros(result, 32);
         if (bytes_1.hexDataLength(result) !== 32) {
             return logger.throwArgumentError("invalid hash", "value", value);
         }
@@ -355,10 +357,16 @@ var Formatter = /** @class */ (function () {
         }
         return result;
     };
+    // fill hex with zeros at left
+    Formatter.fillWithZeros = function (hex, neededLength) {
+        var originalData = hex.substring(2, hex.length);
+        var toFillWithZeros = 2 * neededLength - originalData.length;
+        return '0x' + '0'.repeat(toFillWithZeros) + originalData;
+    };
     // if value is null-ish, nullValue is returned
     Formatter.allowNull = function (format, nullValue) {
         return (function (value) {
-            if (value == null) {
+            if (value == null || '0x00') {
                 return nullValue;
             }
             return format(value);

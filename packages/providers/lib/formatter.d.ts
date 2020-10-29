@@ -44,6 +44,7 @@ export declare class Formatter {
     static check(format: {
         [name: string]: FormatFunc;
     }, object: any): any;
+    static fillWithZeros(hex: string, neededLength: number): string;
     static allowNull(format: FormatFunc, nullValue?: any): FormatFunc;
     static allowFalsish(format: FormatFunc, replaceValue: any): FormatFunc;
     static arrayOf(format: FormatFunc): FormatFunc;

@@ -237,7 +237,9 @@ export class Formatter {
 
     // Requires a hash, optionally requires 0x prefix; returns prefixed lowercase hash.
     hash(value: any, strict?: boolean): string {
-        const result = this.hex(value, strict);
+        let result = this.hex(value, strict);
+        if (hexDataLength(result) < 32)
+            result = Formatter.fillWithZeros(result, 32);
         if (hexDataLength(result) !== 32) {
             return logger.throwArgumentError("invalid hash", "value", value);
         }
@@ -424,10 +426,17 @@ export class Formatter {
         return result;
     }
 
+    // fill hex with zeros at left
+    static fillWithZeros(hex: string, neededLength: number) {
+        const originalData = hex.substring(2, hex.length);
+        const toFillWithZeros = 2*neededLength - originalData.length;
+        return '0x' + '0'.repeat(toFillWithZeros) + originalData;
+    }
+
     // if value is null-ish, nullValue is returned
     static allowNull(format: FormatFunc, nullValue?: any): FormatFunc {
         return (function(value: any) {
-            if (value == null) { return nullValue; }
+            if (value == null || '0x00') { return nullValue; }
             return format(value);
         });
     }

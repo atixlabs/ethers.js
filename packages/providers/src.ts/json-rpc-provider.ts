@@ -162,6 +162,10 @@ export class JsonRpcSigner extends Signer implements TypedDataSigner {
             transaction.gasLimit = this.provider.estimateGas(estimate);
         }
 
+        if (transaction.value == null) {
+            transaction.value = 0;
+        }
+
         return resolveProperties({
             tx: resolveProperties(transaction),
             sender: fromAddress

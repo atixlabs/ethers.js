@@ -159,11 +159,8 @@ export class JsonRpcSigner extends Signer implements TypedDataSigner {
         if (transaction.gasLimit == null) {
             const estimate = shallowCopy(transaction);
             estimate.from = fromAddress;
-            transaction.gasLimit = this.provider.estimateGas(estimate);
-        }
-
-        if (transaction.value == null) {
-            transaction.value = 0;
+            // TODO: This hardcoded value was set because this.provider.estimateGas(transaction) was returning 0
+            transaction.gasLimit = BigNumber.from('6000000');
         }
 
         return resolveProperties({

@@ -185,10 +185,8 @@ var JsonRpcSigner = /** @class */ (function (_super) {
         if (transaction.gasLimit == null) {
             var estimate = properties_1.shallowCopy(transaction);
             estimate.from = fromAddress;
-            transaction.gasLimit = this.provider.estimateGas(estimate);
-        }
-        if (transaction.value == null) {
-            transaction.value = 0;
+            // TODO: This hardcoded value was set because this.provider.estimateGas(transaction) was returning 0
+            transaction.gasLimit = bignumber_1.BigNumber.from('6000000');
         }
         return properties_1.resolveProperties({
             tx: properties_1.resolveProperties(transaction),
